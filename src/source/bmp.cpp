@@ -1,4 +1,6 @@
 #include "bmp.hpp"
+#include "logger.hpp"
+#include "messages.hpp"
 
 BMP::BMP(const std::string &fileName) : header(), pixelData()
 {
@@ -33,24 +35,25 @@ bool BMP::validateHeader() const
 {
     if (std::strncmp(header.signature, "BM", 2) != 0)
     {
-        // Throw an invalid_signature_error
+        Logger::exit(ERR_INCORRECT_FILE_FORMAT, invalid_signature_error);
         return false;
+
     }
 
     if (header.width <= 0 || header.height <= 0)
     {
-        // Throw and invalid_dimensions_error
+        Logger::exit(ERR_INCORRECT_FILE_FORMAT, invalid_dimensions_error);
         return false;
     }
 
     if (header.bitsPerPixel != 24)
     {
-        // Throw an invalid_bpp_warning
+        Logger::warn(invalid_bpp_warning);
     }
 
     if (header.compression != 0)
     {
-        // Throw and unsupported_compression_error
+        Logger::exit(ERR_INCORRECT_FILE_FORMAT, unsupported_compression_error);
         return false;
     }
 
