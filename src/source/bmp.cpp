@@ -7,7 +7,8 @@ BMP::BMP(const std::string &fileName) : header(), pixelData()
     std::ifstream file(fileName, std::ios::binary);
     if (!file.is_open())
     {
-        // Throw an exception
+        file.close();
+        Logger::exit(ERR_INCORRECT_FILE_FORMAT, invalid_header_error + fileName);
     }
 
     file.read(reinterpret_cast<char *>(&header), sizeof(header));
@@ -15,7 +16,7 @@ BMP::BMP(const std::string &fileName) : header(), pixelData()
     if (!validateHeader())
     {
         file.close();
-        // Throw an exception
+        Logger::exit(ERR_INCORRECT_FILE_FORMAT, invalid_header_error + fileName);
     }
 
     const uint32_t bytesPerPixel = header.bitsPerPixel / 8;
@@ -70,7 +71,7 @@ void BMP::save(const std::string &fileName)
     std::ofstream file(fileName, std::ios::binary);
     if (!file.is_open())
     {
-        // Throw an file writing error
+        Logger::exit(ERR_FILE_WRITE_ERROR, failed_create_output_file + fileName);
         return;
     }
 

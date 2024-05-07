@@ -25,3 +25,7 @@ const std::string invalid_dimensions_error = "Invalid BMP dimensions";
 const std::string invalid_bpp_warning = "Invalid BMP bits per pixel, output image may be incorrect";
 
 const std::string unsupported_compression_error = "Unsupported BMP compression type";
+
+const std::string invalid_header_error = "BMP file header is invalid: ";
+
+const std::string failed_create_output_file = "Failed to create output BMP file: ";
