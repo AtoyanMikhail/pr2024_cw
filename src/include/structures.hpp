@@ -1,5 +1,6 @@
 #include <string>
 
+#pragma pack(push, 1)
 struct BMPHeader
 {
     char signature[2];        /**< Сигнатура файла BMP. */
@@ -19,6 +20,7 @@ struct BMPHeader
     uint32_t colorsUsed;      /**< Количество используемых цветов изображения. */
     uint32_t colorsImportant; /**< Количество важных цветов изображения. */
 };
+#pragma pack(pop)
 
 struct RGB
 {
@@ -30,6 +32,6 @@ struct RGB
 
 struct Coordinate
 {
-    int x; /**< Координата x. */
-    int y; /**< Координата y. */
+    int32_t x; /**< Координата x. */
+    int32_t y; /**< Координата y. */
 };

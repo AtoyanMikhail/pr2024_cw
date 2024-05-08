@@ -57,3 +57,7 @@ const std::string pixels_per_meter_y_message = "Pixels per meter (Y axis): ";
 const std::string colors_used_message = "Colors used: ";
 
 const std::string important_colors_message = "Important colors: ";
+
+const std::string invalid_ornament_pattern = "Invalid ornament pattern";
+
+const std::string rectangle_overflow_warning = "The number of possible rectangles is exceeded";

@@ -2,6 +2,7 @@
 #include "structures.hpp"
 #include <cstring>
 #include <fstream>
+#include <math.h>
 
 class BMP
 {
@@ -9,6 +10,8 @@ private:
     RGB getColor(int x, int y) const;
 
     void setColor(int x, int y, const RGB &newColor);
+
+    void drawLine(Coordinate first, Coordinate second, int thikness);
 
 public:
     void getInfo() const;
@@ -23,6 +26,8 @@ public:
 
     void copy(const Coordinate &src_left_up, const Coordinate &src_right_down,
               const Coordinate &dest_left_up);
+
+    void ornament(const std::string pattern, const RGB colour, const int thikness, const int count);
 
 private:
     BMPHeader header;            ///< Заголовок BMP файла.

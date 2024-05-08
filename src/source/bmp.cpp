@@ -5,8 +5,7 @@
 BMP::BMP(const std::string &fileName) : header(), pixelData()
 {
     std::ifstream file(fileName, std::ios::binary);
-    /*
-    
+
     if (!file.is_open())
     {
         file.close();
@@ -20,7 +19,6 @@ BMP::BMP(const std::string &fileName) : header(), pixelData()
         file.close();
         Logger::exit(ERR_INCORRECT_FILE_FORMAT, invalid_header_error + fileName);
     }
-    */
 
     const uint32_t bytesPerPixel = header.bitsPerPixel / 8;
     const uint32_t rowSize = ((header.width * bytesPerPixel + 3) / 4) * 4;
@@ -162,6 +160,21 @@ void BMP::setColor(int x, int y, const RGB &newColor)
     pixelData[index + 2] = newColor.red;
 }
 
+/*
+void BMP::drawLine(Coordinate left, Coordinate right, int thikness = 1)
+{
+    float tg = (right.y - left.y) / (right.x - left.x);
+
+    for (int i = left.x; i <= right.x; i++)
+    {
+        for (int j = left.y; j <= right.y; j++)
+        {
+
+        }
+    }
+}
+*/
+
 void BMP::copy(const Coordinate &src_left_up, const Coordinate &src_right_down,
                const Coordinate &dest_left_up)
 {
@@ -202,4 +215,102 @@ void BMP::copy(const Coordinate &src_left_up, const Coordinate &src_right_down,
             offsetX++;
         }
     }
+}
+
+void BMP::ornament(const std::string pattern, const RGB color, const int thikness, const int count)
+{
+    if (pattern == "rectangle")
+    {
+        int left_offset = 0;
+        int right_offset = header.width;
+        int top_offset = 0;
+        int bottom_offset = header.height;
+        for (int cnt = 0; cnt < count; cnt++)
+        {
+            if (left_offset + thikness >= right_offset || top_offset + thikness >= bottom_offset)
+            {
+                Logger::warn(rectangle_overflow_warning);
+                return;
+            }
+
+            for (int x = left_offset; x < right_offset; x++)
+            {
+                for (int y = cnt * thikness * 2; y <= cnt * thikness * 2 + thikness - 1; y++)
+                {
+                    setColor(x, y, color);
+                    setColor(x, header.height - y, color);
+                }
+            }
+
+            for (int y = top_offset; y < bottom_offset; y++)
+            {
+                for (int x = cnt * thikness * 2; x <= cnt * thikness * 2 + thikness - 1; x++)
+                {
+                    setColor(x, y, color);
+                    setColor(header.width - x - 1, y, color);
+                }
+            }
+            left_offset += thikness * 2;
+            right_offset -= thikness * 2;
+            top_offset += thikness * 2;
+            bottom_offset -= thikness * 2;
+        }
+        return;
+    }
+    if (pattern == "circle")
+    {
+        struct Coordinate center = {header.width / 2, header.height / 2};
+        int radius = std::min(header.height, header.width) / 2;
+
+        for (int x = 0; x <= header.width; x++)
+        {
+            for (int y = 0; y <= header.height; y++)
+            {
+                if (pow((center.y - y), 2) + pow((center.x - x), 2) > pow(radius, 2))
+                {
+                    setColor(x, y, color);
+                }
+            }
+        }
+        return;
+    }
+    if (pattern == "semicircle")
+    {
+        int horizontal_radius = ceil(float(header.width) / count / 2) - thikness/2;
+        int vertical_radius = ceil(float(header.height) / count / 2) - thikness/2;
+        
+        for (int oXcenter = horizontal_radius + thikness/2; oXcenter - horizontal_radius < header.width; oXcenter += horizontal_radius * 2 + thikness)
+        {
+            for (int x = oXcenter - horizontal_radius - thikness; x <= oXcenter + horizontal_radius + thikness; x++)
+            {
+                for (int y = 0; y <= horizontal_radius + thikness; y++)
+                {
+                    if (pow((x - oXcenter), 2) + pow((y), 2) >= pow(horizontal_radius, 2) &&
+                        pow((x - oXcenter), 2) + pow((y), 2) <= pow(horizontal_radius + thikness, 2))
+                    {
+                        setColor(x, y, color);
+                        setColor(x, header.height - y, color);
+                    }
+                }
+            }
+        }
+
+        for (int oYcenter = vertical_radius + thikness/2; oYcenter - vertical_radius < header.height; oYcenter += vertical_radius * 2 + thikness)
+        {
+            for (int y = oYcenter - vertical_radius - thikness; y <= oYcenter + vertical_radius + thikness; y++)
+            {
+                for (int x = 0; x <= vertical_radius + thikness; x++)
+                {
+                    if (pow((y - oYcenter), 2) + pow((x), 2) >= pow(vertical_radius, 2) &&
+                        pow((y - oYcenter), 2) + pow((x), 2) <= pow(vertical_radius + thikness, 2))
+                    {
+                        setColor(x, y, color);
+                        setColor(header.width - x, y, color);
+                    }
+                }
+            }
+        }
+        return;
+    }
+    Logger::exit(1, invalid_ornament_pattern);
 }
