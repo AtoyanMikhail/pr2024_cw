@@ -29,3 +29,31 @@ const std::string unsupported_compression_error = "Unsupported BMP compression t
 const std::string invalid_header_error = "BMP file header is invalid: ";
 
 const std::string failed_create_output_file = "Failed to create output BMP file: ";
+
+const std::string invalid_copy_region = "Invalid copy region or destination parameters";
+
+const std::string copy_exceeds_bounds_error = "Copying region exceeds destination image boundaries.";
+
+const std::string signature_message = "Signature: ";
+
+const std::string file_size_message = "File size: ";
+
+const std::string data_offset_message = "Data offset: ";
+
+const std::string header_size_message = "Header size: ";
+
+const std::string image_dimensions_message = "Image dimensions: ";
+
+const std::string bits_per_pixel_message = "Bits per pixel: ";
+
+const std::string compression_message = "Compression: ";
+
+const std::string image_size_message = "Image size: ";
+
+const std::string pixels_per_meter_x_message = "Pixels per meter (X axis): ";
+
+const std::string pixels_per_meter_y_message = "Pixels per meter (Y axis): ";
+
+const std::string colors_used_message = "Colors used: ";
+
+const std::string important_colors_message = "Important colors: ";
