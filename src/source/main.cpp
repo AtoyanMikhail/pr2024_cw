@@ -5,8 +5,7 @@
 int main()
 {
     const std::string input_file = "images/negr.bmp";
-    
-    // Загрузка изображения BMP
+
     BMP bmp(input_file);
 
     if (!bmp.isValid())
@@ -16,9 +15,7 @@ int main()
 
     bmp.getInfo();
 
-    const std::string pattern = "semicircle";
-
-    bmp.ornament(pattern, RGB(0, 255, 0), 20, 7);
+    bmp.ornament("semicircle", RGB(0,255,0), 5, 30);
 
     bmp.save("output.bmp");
 
