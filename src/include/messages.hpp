@@ -61,3 +61,7 @@ const std::string important_colors_message = "Important colors: ";
 const std::string invalid_ornament_pattern = "Invalid ornament pattern";
 
 const std::string rectangle_overflow_warning = "The number of possible rectangles is exceeded";
+
+const std::string invalid_ornament_parameters = "Ornament parametrs are invaild";
+
+const std::string invalid_hexagon_parameters = "Hexagon parametrs are invaild";

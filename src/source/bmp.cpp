@@ -88,6 +88,34 @@ bool BMP::isValid() const
     return !pixelData.empty();
 }
 
+RGB BMP::getColor(int x, int y) const
+{
+    if (x < 0 || x >= header.width || y < 0 || y >= header.height)
+        return RGB();
+
+    const uint32_t bytesPerPixel = header.bitsPerPixel / 8;
+    const uint32_t bytesPerRow = (bytesPerPixel * header.width + 3) & ~3;
+    const uint32_t index =
+        ((header.height - 1 - y) * bytesPerRow) + (x * bytesPerPixel);
+
+    return RGB(pixelData[index + 2], pixelData[index + 1], pixelData[index]);
+}
+
+void BMP::setColor(int x, int y, const RGB &newColor)
+{
+    if (x < 0 || x >= header.width || y < 0 || y >= header.height)
+        return;
+
+    const uint32_t bytesPerPixel = header.bitsPerPixel / 8;
+    const uint32_t bytesPerRow = (bytesPerPixel * header.width + 3) & ~3;
+    const uint32_t index =
+        ((header.height - 1 - y) * bytesPerRow) + (x * bytesPerPixel);
+
+    pixelData[index] = newColor.blue;
+    pixelData[index + 1] = newColor.green;
+    pixelData[index + 2] = newColor.red;
+}
+
 void BMP::save(const std::string &fileName)
 {
     std::ofstream file(fileName, std::ios::binary);
@@ -132,49 +160,6 @@ void BMP::colorReplace(const RGB &color_replace_old_color, const RGB &color_repl
     }
 }
 
-RGB BMP::getColor(int x, int y) const
-{
-    if (x < 0 || x >= header.width || y < 0 || y >= header.height)
-        return RGB();
-
-    const uint32_t bytesPerPixel = header.bitsPerPixel / 8;
-    const uint32_t bytesPerRow = (bytesPerPixel * header.width + 3) & ~3;
-    const uint32_t index =
-        ((header.height - 1 - y) * bytesPerRow) + (x * bytesPerPixel);
-
-    return RGB(pixelData[index + 2], pixelData[index + 1], pixelData[index]);
-}
-
-void BMP::setColor(int x, int y, const RGB &newColor)
-{
-    if (x < 0 || x >= header.width || y < 0 || y >= header.height)
-        return;
-
-    const uint32_t bytesPerPixel = header.bitsPerPixel / 8;
-    const uint32_t bytesPerRow = (bytesPerPixel * header.width + 3) & ~3;
-    const uint32_t index =
-        ((header.height - 1 - y) * bytesPerRow) + (x * bytesPerPixel);
-
-    pixelData[index] = newColor.blue;
-    pixelData[index + 1] = newColor.green;
-    pixelData[index + 2] = newColor.red;
-}
-
-/*
-void BMP::drawLine(Coordinate left, Coordinate right, int thikness = 1)
-{
-    float tg = (right.y - left.y) / (right.x - left.x);
-
-    for (int i = left.x; i <= right.x; i++)
-    {
-        for (int j = left.y; j <= right.y; j++)
-        {
-
-        }
-    }
-}
-*/
-
 void BMP::copy(const Coordinate &src_left_up, const Coordinate &src_right_down,
                const Coordinate &dest_left_up)
 {
@@ -217,100 +202,151 @@ void BMP::copy(const Coordinate &src_left_up, const Coordinate &src_right_down,
     }
 }
 
-void BMP::ornament(const std::string pattern, const RGB color, const int thikness, const int count)
+void BMP::drawRectangle(const Coordinate left_top, const Coordinate right_bottom, const RGB color)
 {
-    if (pattern == "rectangle")
+    for (int x = left_top.x; x <= right_bottom.x; x++)
     {
-        int left_offset = 0;
-        int right_offset = header.width;
-        int top_offset = 0;
-        int bottom_offset = header.height;
-        for (int cnt = 0; cnt < count; cnt++)
-        {
-            if (left_offset + thikness >= right_offset || top_offset + thikness >= bottom_offset)
-            {
-                Logger::warn(rectangle_overflow_warning);
-                return;
-            }
-
-            for (int x = left_offset; x < right_offset; x++)
-            {
-                for (int y = cnt * thikness * 2; y <= cnt * thikness * 2 + thikness - 1; y++)
-                {
-                    setColor(x, y, color);
-                    setColor(x, header.height - y, color);
-                }
-            }
-
-            for (int y = top_offset; y < bottom_offset; y++)
-            {
-                for (int x = cnt * thikness * 2; x <= cnt * thikness * 2 + thikness - 1; x++)
-                {
-                    setColor(x, y, color);
-                    setColor(header.width - x - 1, y, color);
-                }
-            }
-            left_offset += thikness * 2;
-            right_offset -= thikness * 2;
-            top_offset += thikness * 2;
-            bottom_offset -= thikness * 2;
-        }
-        return;
+        setColor(x, left_top.y, color);
+        setColor(x, right_bottom.y, color);
     }
+
+    for (int y = left_top.y; y <= right_bottom.y; y++)
+    {
+        setColor(left_top.x, y, color);
+        setColor(right_bottom.x, y, color);
+    }
+}
+
+void BMP::drawCircle(const Coordinate center, const int radius, const int thickness, const RGB color)
+{
+    for (int x = center.x - radius - thickness; x <= center.x + radius + thickness; x++)
+    {
+        for (int y = center.y - radius - thickness; y <= center.y + radius + thickness; y++)
+        {
+            if (pow(x - center.x, 2) + pow((y - center.y), 2) >= pow(radius, 2) &&
+                pow(x - center.x, 2) + pow((y - center.y), 2) < pow(radius + thickness, 2))
+            {
+                setColor(x, y, color);
+            }
+        }
+    }
+}
+
+void BMP::ornament(const std::string pattern, const RGB color, const int thickness = 0, const int count = 0)
+{
     if (pattern == "circle")
     {
         struct Coordinate center = {header.width / 2, header.height / 2};
         int radius = std::min(header.height, header.width) / 2;
 
         for (int x = 0; x <= header.width; x++)
-        {
             for (int y = 0; y <= header.height; y++)
-            {
                 if (pow((center.y - y), 2) + pow((center.x - x), 2) > pow(radius, 2))
-                {
                     setColor(x, y, color);
-                }
+
+        return;
+    }
+
+    if (thickness <= 0 || count <= 0)
+        Logger::exit(ERR_INVALID_ARGUMENT, invalid_ornament_parameters);
+
+    if (pattern == "rectangle")
+    {
+        struct Coordinate left_top = {0, 0};
+        struct Coordinate right_bottom = {header.width - 1, header.height - 1};
+
+        for (int cnt = 0; cnt < count; cnt++)
+        {
+
+            if ((left_top.x + thickness >= right_bottom.x) || (left_top.y + thickness >= right_bottom.y))
+            {
+                Logger::warn(rectangle_overflow_warning);
+                return;
             }
+
+            for (int layer = 0; layer < thickness; layer++)
+            {
+                drawRectangle(left_top, right_bottom, color);
+                left_top.x += 1;
+                left_top.y += 1;
+                right_bottom.x -= 1;
+                right_bottom.y -= 1;
+            }
+
+            left_top.x += thickness;
+            left_top.y += thickness;
+            right_bottom.x -= thickness;
+            right_bottom.y -= thickness;
         }
         return;
     }
+
     if (pattern == "semicircle")
     {
-        int horizontal_radius = ceil(float(header.width) / count / 2) - thikness/2;
-        int vertical_radius = ceil(float(header.height) / count / 2) - thikness/2;
-        
-        for (int oXcenter = horizontal_radius + thikness/2; oXcenter - horizontal_radius < header.width; oXcenter += horizontal_radius * 2 + thikness)
+        int horizontal_radius = ceil(float(header.width) / count / 2) - thickness / 2;
+        int vertical_radius = ceil(float(header.height) / count / 2) - thickness / 2;
+
+        for (int oXcenter = horizontal_radius + thickness / 2; oXcenter - horizontal_radius < header.width; oXcenter += horizontal_radius * 2 + thickness)
         {
-            for (int x = oXcenter - horizontal_radius - thikness; x <= oXcenter + horizontal_radius + thikness; x++)
-            {
-                for (int y = 0; y <= horizontal_radius + thikness; y++)
-                {
-                    if (pow((x - oXcenter), 2) + pow((y), 2) >= pow(horizontal_radius, 2) &&
-                        pow((x - oXcenter), 2) + pow((y), 2) <= pow(horizontal_radius + thikness, 2))
-                    {
-                        setColor(x, y, color);
-                        setColor(x, header.height - y, color);
-                    }
-                }
-            }
+            struct Coordinate center = {oXcenter, 0};
+            drawCircle(center, horizontal_radius, thickness, color);
+            center.y = header.height;
+            drawCircle(center, horizontal_radius, thickness, color);
         }
 
-        for (int oYcenter = vertical_radius + thikness/2; oYcenter - vertical_radius < header.height; oYcenter += vertical_radius * 2 + thikness)
+        for (int oYcenter = vertical_radius + thickness / 2; oYcenter - vertical_radius < header.height; oYcenter += vertical_radius * 2 + thickness)
         {
-            for (int y = oYcenter - vertical_radius - thikness; y <= oYcenter + vertical_radius + thikness; y++)
-            {
-                for (int x = 0; x <= vertical_radius + thikness; x++)
-                {
-                    if (pow((y - oYcenter), 2) + pow((x), 2) >= pow(vertical_radius, 2) &&
-                        pow((y - oYcenter), 2) + pow((x), 2) <= pow(vertical_radius + thikness, 2))
-                    {
-                        setColor(x, y, color);
-                        setColor(header.width - x, y, color);
-                    }
-                }
-            }
+            struct Coordinate center = {0, oYcenter};
+            drawCircle(center, vertical_radius, thickness, color);
+            center.x = header.width;
+            drawCircle(center, vertical_radius, thickness, color);
         }
         return;
     }
-    Logger::exit(1, invalid_ornament_pattern);
+
+    Logger::exit(ERR_INVALID_ARGUMENT, invalid_ornament_pattern);
+}
+
+bool isInHexagonArea(const Coordinate center, int x, int y, int radius)
+{
+    // Просто конченная математическая формула для проверки на вхождение точки в область шестиугольника.
+    return abs(float(x) + float(radius) / 2 - center.x) + abs(float(x) - float(radius) / 2 - center.x) + float(2 * abs(y - center.y)) / sqrt(3) <= 2 * radius;
+}
+
+void BMP::drawHexagon(const Coordinate center, const int radius, const RGB color)
+{
+    for (int x = center.x - radius; x <= center.x + radius; x++)
+    {
+        for (int y = center.y - radius; y <= center.y + radius; y++)
+        {
+            if (isInHexagonArea(center, x, y, radius) and not isInHexagonArea(center, x, y, radius - 1))
+            {
+                setColor(x, y, color);
+            }
+        }
+    }
+}
+
+void BMP::hexagon(const Coordinate center, const int radius, const int thickness, const RGB color,
+                  const bool fill, const RGB fill_color)
+{
+    if (thickness <= 0 || radius <= 0)
+        Logger::exit(ERR_INVALID_ARGUMENT, invalid_hexagon_parameters);
+
+    int current_radius = radius + thickness - 1;
+
+    while (current_radius >= radius)
+    {
+        drawHexagon(center, current_radius, color);
+        current_radius--;
+    }
+
+    if (!fill)
+        return;
+
+    while (current_radius >= 0)
+    {
+        drawHexagon(center, current_radius, fill_color);
+        current_radius--;
+    }
 }
