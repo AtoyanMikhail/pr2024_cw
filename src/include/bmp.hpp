@@ -1,5 +1,4 @@
 #include "operation_params.hpp"
-#include "structures.hpp"
 #include <cstring>
 #include <fstream>
 #include <math.h>

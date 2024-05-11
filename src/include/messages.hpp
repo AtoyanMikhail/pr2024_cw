@@ -65,3 +65,61 @@ const std::string rectangle_overflow_warning = "The number of possible rectangle
 const std::string invalid_ornament_parameters = "Ornament parametrs are invaild";
 
 const std::string invalid_hexagon_parameters = "Hexagon parametrs are invaild";
+
+const std::string invalid_argument_error = "Invalid argument for ";
+
+const std::string invalid_color_format_error = "Invalid color format";
+
+const std::string invalid_color_range_error = "Color out of range [0-255] got: ";
+
+const std::string filling_a_nonexistent_hexagon_err = "Tried to fill a non-existent hexagon. Operation aborted";
+
+const std::string too_many_args_err = "Too many arguments";
+
+const std::string hexagon_warning = "=Hexagon operation is requested=";
+
+const std::string color_replace_warning = "=Color replace operation is requested=";
+
+const std::string ornamenet_warning = "=Ornament operation is requested=";
+
+const std::string image_copy_warning = "=Image copy operation is requested=";
+
+const std::string help_usage_description = "Usage: program_name [options] filename";
+
+const std::string help_usage_start = "Options: ";
+
+const std::string hexagon_option_description = "  --hexagon              Hexagon operation";
+
+const std::string left_up_option_description = "  --left_up <x.y>        Coordinates of left-up corner";
+
+const std::string right_down_option_description = "  --right_down <x.y>     Coordinates of right-down corner";
+
+const std::string dest_left_up_option_description = "  --dest_left_up <x.y>   Coordinates of destination left-up corner";
+
+const std::string old_color_option_description = "  --old_color <r.g.b>    Old color to replace";
+
+const std::string new_color_option_description = "  --new_color <r.g.b>    New color to replace with";
+
+const std::string color_option_description = "  --color <r.g.b>        Color of hexagon/ornament";
+
+const std::string copy_option_description = "  --copy                 Copy operation";
+
+const std::string color_replace_option_description = "  --color_replace        Color replace operation";
+
+const std::string ornament_option_description = "  --split                Ornament operation";
+
+const std::string radius_option_description = "  --radius <value>       Radius of hexagon";
+
+const std::string thickness_option_description = "  --thickness <value>    Thickness of hexagon/ornament";
+
+const std::string output_option_description = "  -o, --output <file>    Output file";
+
+const std::string input_option_description = "  -i, --input <file>     Input file";
+
+const std::string help_option_description = "  -h, --help             Display this information";
+
+const std::string fill_option_description = "  --fill                 Filling hexagon with color";
+
+const std::string fill_color_option_description = "  --fill_color           Color of hexagon's insides";
+
+

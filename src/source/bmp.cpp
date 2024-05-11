@@ -310,7 +310,7 @@ void BMP::ornament(const std::string pattern, const RGB color, const int thickne
 bool isInHexagonArea(const Coordinate center, int x, int y, int radius)
 {
     // Просто конченная математическая формула для проверки на вхождение точки в область шестиугольника.
-    return abs(float(x) + float(radius) / 2 - center.x) + abs(float(x) - float(radius) / 2 - center.x) + float(2 * abs(y - center.y)) / sqrt(3) <= 2 * radius;
+    return abs(float(x) + float(radius) / 2 - center.x) + abs(float(x) - float(radius) / 2 - center.x) + float(2 * abs(y - center.y)) / sqrt(3) < 2 * radius;
 }
 
 void BMP::drawHexagon(const Coordinate center, const int radius, const RGB color)
