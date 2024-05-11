@@ -35,3 +35,52 @@ struct Coordinate
     int32_t x; /**< Координата x. */
     int32_t y; /**< Координата y. */
 };
+
+struct Operations
+{
+    std::string input_file;              /**< Путь к входному файлу. */
+    std::string output_file = "out.bmp"; /**< Путь к выходному файлу (по умолчанию "out.bmp"). */
+    bool info = false;                   /**< Флаг вывода информации о изображении. */
+    bool hexagon = false;                 /**< Флаг отражения изображения. */
+    Coordinate center;
+    int radius = 0;
+    int thickness = 0;
+    RGB color;
+    bool fill = false;
+    RGB fill_color;
+    bool copy = false;                   /**< Флаг копирования выделенной области. */
+    Coordinate dest_left_up;            /**< Левая верхняя точка для вставки скопированной области. */
+    Coordinate left_up; 
+    Coordinate right_down;             
+    bool color_replace = false;          /**< Флаг замены цвета. */
+    RGB old_color;                       /**< Старый цвет, который будет заменен. */
+    RGB new_color;                       /**< Новый цвет, на который будет заменен старый цвет. */
+    bool ornament = false;                  /**< Флаг разделения изображения на части. */
+    std::string pattern;
+    int count = 0;                    
+
+
+    Operations()
+    : input_file()
+    , output_file("out.bmp")
+    , info(false)
+    , hexagon(false)               
+    , center()
+    , radius(0)
+    , thickness(0)
+    , color()
+    , fill(false)
+    , fill_color()
+    , copy(false)                 
+    , dest_left_up()           
+    , left_up() 
+    , right_down()            
+    , color_replace(false)         
+    , old_color()                
+    , new_color()                   
+    , ornament(false)                
+    , pattern()
+    , count(0) 
+    {
+    }
+};
