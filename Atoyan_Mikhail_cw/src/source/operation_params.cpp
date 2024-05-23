@@ -92,10 +92,10 @@ Operations parseCommandLine(int argc, char* argv[])
         { 260, [&](const char* option_argument) { params.color = parseRGB(option_argument); } },
         { 261, [&](const char*) { params.fill = true; } },
         { 262, [&](const char* option_argument) { params.fill_color = parseRGB(option_argument); } },
-        { 263, [&](const char*) { params.copy = true; } },        
-        { 264, [&](const char* option_argument) { params.left_up = parseCoordinate(option_argument); } },
-        { 265, [&](const char* option_argument) { params.right_down = parseCoordinate(option_argument); } },
-        { 266, [&](const char* option_argument) { params.dest_left_up = parseCoordinate(option_argument); } },
+        { 263, [&](const char*) { params.copy = true; } },
+        { 264, [&](const char* option_argument) { params.dest_left_up = parseCoordinate(option_argument); } },        
+        { 265, [&](const char* option_argument) { params.left_up = parseCoordinate(option_argument); } },
+        { 266, [&](const char* option_argument) { params.right_down = parseCoordinate(option_argument); } },
         { 267, [&](const char*) { params.color_replace = true; } },
         { 268, [&](const char* option_argument) { params.old_color = parseRGB(option_argument); } },
         { 269, [&](const char* option_argument) { params.new_color = parseRGB(option_argument); } },
@@ -103,12 +103,16 @@ Operations parseCommandLine(int argc, char* argv[])
         { 271, [&](const char* option_argument) { params.pattern = option_argument; } },
         { 272, [&](const char* option_argument) { params.count = parseValues(option_argument)[0]; } },
         { 273, [&](const char*) { params.info = true; } },
-        { 274, [&](const char*) { Logger::set_colors_enabled(true); } },
+        { 274, [&](const char*) { params.compress = true; } },
+        { 275, [&](const char* option_argument) { params.num = parseValues(option_argument)[0]; } },
+        { 276, [&](const char*) { Logger::set_colors_enabled(true); } },
+        { 277, [&](const char*) { params.info = true; } },
+        
     };
 
     const char* short_options = "hi:o:";
 
-    static struct option long_options[] = { { "help", no_argument, nullptr, 'h' }, { "input", required_argument, nullptr, 'i' }, { "output", required_argument, nullptr, 'o' }, { "hexagon", no_argument, nullptr, 256 }, { "center", required_argument, nullptr, 257 }, { "radius", required_argument, nullptr, 258 }, { "thickness", required_argument, nullptr, 259 }, { "color", required_argument, nullptr, 260 }, { "fill", no_argument, nullptr, 261 }, { "fill_color", required_argument, nullptr, 262 }, { "copy", no_argument, nullptr, 263 }, { "dest_left_up", required_argument, nullptr, 264 }, { "left_up", required_argument, nullptr, 265 }, { "right_down", required_argument, nullptr, 266 }, { "color_replace", no_argument, nullptr, 267 }, { "old_color", required_argument, nullptr, 268 }, { "new_color", required_argument, nullptr, 269 }, { "ornament", no_argument, nullptr, 270 }, { "pattern", required_argument, nullptr, 271 }, { "count", required_argument, nullptr, 272 }, { "info", no_argument, nullptr, 273 }, { nullptr, 0, nullptr, 0 } };
+    static struct option long_options[] = { { "help", no_argument, nullptr, 'h' }, { "input", required_argument, nullptr, 'i' }, { "output", required_argument, nullptr, 'o' }, { "hexagon", no_argument, nullptr, 256 }, { "center", required_argument, nullptr, 257 }, { "radius", required_argument, nullptr, 258 }, { "thickness", required_argument, nullptr, 259 }, { "color", required_argument, nullptr, 260 }, { "fill", no_argument, nullptr, 261 }, { "fill_color", required_argument, nullptr, 262 }, { "copy", no_argument, nullptr, 263 }, { "dest_left_up", required_argument, nullptr, 264 }, { "left_up", required_argument, nullptr, 265 }, { "right_down", required_argument, nullptr, 266 }, { "color_replace", no_argument, nullptr, 267 }, { "old_color", required_argument, nullptr, 268 }, { "new_color", required_argument, nullptr, 269 }, { "ornament", no_argument, nullptr, 270 }, { "pattern", required_argument, nullptr, 271 }, { "count", required_argument, nullptr, 272 }, { "info", no_argument, nullptr, 273 }, {"compress", no_argument, nullptr, 274}, {"num", required_argument, nullptr, 275}, { nullptr, 0, nullptr, 0 } };
 
     int opt;
 

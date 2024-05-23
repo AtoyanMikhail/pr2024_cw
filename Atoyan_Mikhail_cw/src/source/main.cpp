@@ -53,6 +53,13 @@ int main(int argc, char *argv[])
         Logger::log(success_message);
     }
 
+    if (params.compress)
+    {
+        Logger::warn(compress_warning);
+        bmp = bmp.compress(bmp, params.num);
+        Logger::log(success_message);
+    }
+
     // Сохранение изображения
     bmp.save(params.output_file);
     

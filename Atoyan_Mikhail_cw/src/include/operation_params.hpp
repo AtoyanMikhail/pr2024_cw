@@ -1,9 +1,9 @@
 #pragma once
 
 #include "structures.hpp"
+
 #include <getopt.h>
 #include <vector>
-
 #include <cstring>
 #include <functional>
 #include <map>

@@ -2,6 +2,8 @@
 #include "logger.hpp"
 #include "messages.hpp"
 
+#include <thread>
+
 BMP::BMP(const std::string &fileName) : header(), pixelData()
 {
     std::ifstream file(fileName, std::ios::binary);
@@ -53,6 +55,36 @@ void BMP::getInfo() const
     Logger::log(colors_used_message + std::to_string(header.colorsUsed));
     Logger::log(important_colors_message +
                 std::to_string(header.colorsImportant));
+}
+
+void BMP::initialize(int32_t width, int32_t height)
+{
+    // Clear header
+    std::memset(&header, 0, sizeof(header));
+    std::strcpy(header.signature, "BM");
+
+    // Calculate bytes per pixel and row size
+    const uint32_t bytesPerPixel = 3; // 24 bits per pixel
+    const uint32_t rowSize = ((width * bytesPerPixel + 3) / 4) * 4; // Align row size to 4 bytes
+    const uint32_t imageSize = rowSize * height;
+
+    // Fill BMP header
+    header.fileSize = sizeof(BMPHeader) + imageSize;
+    header.dataOffset = sizeof(BMPHeader);
+    header.headerSize = 40; // BITMAPINFOHEADER size
+    header.width = width;
+    header.height = height;
+    header.planes = 1;
+    header.bitsPerPixel = 24; // 24 bits per pixel
+    header.compression = 0; // No compression
+    header.imageSize = imageSize;
+    header.xPixelsPerMeter = 2835; // 72 DPI
+    header.yPixelsPerMeter = 2835; // 72 DPI
+    header.colorsUsed = 0; // Use all colors
+    header.colorsImportant = 0; // All colors are important
+
+    // Allocate pixel data and initialize to black
+    pixelData.assign(imageSize, 0);
 }
 
 bool BMP::validateHeader() const
@@ -160,45 +192,16 @@ void BMP::colorReplace(const RGB &color_replace_old_color, const RGB &color_repl
     }
 }
 
-void BMP::copy(const Coordinate &src_left_up, const Coordinate &src_right_down,
-               const Coordinate &dest_left_up)
+void BMP::copy(const Coordinate& src_left_up, const Coordinate& src_right_down, const Coordinate& dest_left_up)
 {
-    if (src_left_up.x < 0 || src_left_up.y < 0 || dest_left_up.x <= 0 ||
-        dest_left_up.x < 0)
-    {
-        Logger::exit(ERR_INVALID_ARGUMENT, invalid_copy_region);
-        return;
-    }
-    int src_width = src_right_down.x - src_left_up.x;
-    int src_height = src_right_down.y - src_left_up.y;
-    int dest_width = header.width - dest_left_up.x;
-    int dest_height = header.height - dest_left_up.y;
+    int src_x_min = std::min(src_left_up.x, src_right_down.x);
+    int src_x_max = std::max(src_left_up.x, src_right_down.x);
+    int src_y_min = std::min(src_left_up.y, src_right_down.y);
+    int src_y_max = std::max(src_left_up.y, src_right_down.y);
 
-    if (src_width <= 0 || src_height <= 0 || dest_width <= 0 ||
-        dest_height <= 0)
+    for (int x = src_x_min; x <= src_x_max; x++)
     {
-        Logger::exit(ERR_INVALID_ARGUMENT, invalid_copy_region);
-        return;
-    }
-
-    if (src_width > dest_width || src_height > dest_height)
-    {
-        Logger::warn(copy_exceeds_bounds_error);
-    }
-    else
-    {
-        int offsetX = 0;
-        for (int x = src_left_up.x; x < src_right_down.x; x++)
-        {
-            int offsetY = 0;
-            for (int y = src_left_up.y; y < src_right_down.y; y++)
-            {
-                setColor(dest_left_up.x + offsetX, dest_left_up.y + offsetY,
-                         getColor(x, y));
-                offsetY++;
-            }
-            offsetX++;
-        }
+        for (int y = src_y_min; y <= src_y_max; y++) { setColor(dest_left_up.x + (x - src_x_min), dest_left_up.y + (y - src_y_min), getColor(x, y)); }
     }
 }
 
@@ -230,6 +233,7 @@ void BMP::drawCircle(const Coordinate center, const int radius, const int thickn
             }
         }
     }
+
 }
 
 void BMP::ornament(const std::string pattern, const RGB color, const int thickness = 0, const int count = 0)
@@ -281,7 +285,7 @@ void BMP::ornament(const std::string pattern, const RGB color, const int thickne
         return;
     }
 
-    if (pattern == "semicircle")
+    if (pattern == "semicircles")
     {
         int horizontal_radius = ceil(float(header.width) / count / 2) - thickness / 2;
         int vertical_radius = ceil(float(header.height) / count / 2) - thickness / 2;
@@ -310,22 +314,76 @@ void BMP::ornament(const std::string pattern, const RGB color, const int thickne
 bool isInHexagonArea(const Coordinate center, int x, int y, int radius)
 {
     // Просто конченная математическая формула для проверки на вхождение точки в область шестиугольника.
-    return abs(float(x) + float(radius) / 2 - center.x) + abs(float(x) - float(radius) / 2 - center.x) + float(2 * abs(y - center.y)) / sqrt(3) < 2 * radius;
+    return abs(float(x) + float(radius) / 2 - center.x) + abs(float(x) - float(radius) / 2 - center.x) + float(2 * abs(y - center.y)) / sqrt(3) < 2 * radius + 1;
 }
 
 void BMP::drawHexagon(const Coordinate center, const int radius, const RGB color)
-{
-    for (int x = center.x - radius; x <= center.x + radius; x++)
+{   
+    for (int x = center.x - radius; x <= center.x; x++)
     {
-        for (int y = center.y - radius; y <= center.y + radius; y++)
+        for (int y = center.y - radius; y <= center.y; y++)
         {
-            if (isInHexagonArea(center, x, y, radius) and not isInHexagonArea(center, x, y, radius - 1))
+            if (isInHexagonArea(center, x, y, radius))
             {
                 setColor(x, y, color);
+                setColor(x, 2*center.y - y, color);
+                setColor(2*center.x - x, y, color);
+                setColor(2*center.x - x, 2*center.y - y, color);
             }
         }
     }
 }
+
+void BMP::drawThickLine(int x0, int y0, int x1, int y1, int thickness, const RGB color)
+{
+    int dx = std::abs(x1 - x0);
+    int dy = std::abs(y1 - y0);
+    int sx = (x0 < x1) ? 1 : -1;
+    int sy = (y0 < y1) ? 1 : -1;
+    int err = dx - dy;
+    int radius = thickness / 2;
+    int radiusSquared = radius * radius;
+    int x, y;
+
+    int iSquared, jSquared;
+    for (x = -radius; x <= radius; ++x)
+    {
+        iSquared = x * x;
+        for (y = -radius; y <= radius; ++y)
+        {
+            jSquared = y * y;
+            if (iSquared + jSquared <= radiusSquared) { setColor(x0 + x, y0 + y, color); }
+        }
+    }
+
+    while (x0 != x1 || y0 != y1)
+    {
+        int e2 = 2 * err;
+        if (e2 > -dy)
+        {
+            err -= dy;
+            x0 += sx;
+        }
+        if (e2 < dx)
+        {
+            err += dx;
+            y0 += sy;
+        }
+
+        if (x0 + radius < 0 || y0 + radius < 0 || x0 - radius > header.width || y0 - radius > header.height) { continue; }
+
+        for (x = -radius; x <= radius; ++x)
+        {
+            iSquared = x * x;
+            for (y = -radius; y <= radius; ++y)
+            {
+                jSquared = y * y;
+                if (iSquared + jSquared <= radiusSquared) { setColor(x0 + x, y0 + y, color); }
+            }
+        }
+    }
+}
+
 
 void BMP::hexagon(const Coordinate center, const int radius, const int thickness, const RGB color,
                   const bool fill, const RGB fill_color)
@@ -333,20 +391,50 @@ void BMP::hexagon(const Coordinate center, const int radius, const int thickness
     if (thickness <= 0 || radius <= 0)
         Logger::exit(ERR_INVALID_ARGUMENT, invalid_hexagon_parameters);
 
-    int current_radius = radius + thickness - 1;
-
-    while (current_radius >= radius)
-    {
-        drawHexagon(center, current_radius, color);
-        current_radius--;
+    if (fill){
+        drawHexagon(center, radius, fill_color);
     }
 
-    if (!fill)
-        return;
+    drawThickLine(center.x - radius, center.y, center.x - radius/2, center.y - radius*sqrt(3)/2, thickness, color);
+    drawThickLine(center.x - radius/2, center.y - radius*sqrt(3)/2, center.x + radius/2, center.y - radius*sqrt(3)/2,  thickness, color);
+    drawThickLine(center.x + radius/2, center.y - radius*sqrt(3)/2, center.x + radius, center.y, thickness, color);
+    drawThickLine(center.x + radius, center.y, center.x + radius/2, center.y + radius*sqrt(3)/2 + 1, thickness, color);
+    drawThickLine(center.x + radius/2, center.y + radius*sqrt(3)/2 + 1, center.x - radius/2, center.y + radius*sqrt(3)/2 + 1, thickness, color);
+    drawThickLine(center.x - radius/2, center.y + radius*sqrt(3)/2 + 1, center.x - radius, center.y, thickness, color);
+}
 
-    while (current_radius >= 0)
-    {
-        drawHexagon(center, current_radius, fill_color);
-        current_radius--;
+RGB BMP::getAverageColor(int x0, int y0, int compression_depth){
+    int count = 0;
+    int r = 0;
+    int g = 0;
+    int b = 0;
+
+    for (int x = x0; x < x0 + compression_depth; x++){
+        for (int y = y0; y < y0 + compression_depth; y++){
+            if (x < 0 || y < 0 || x > header.width || y > header.height) { continue; }
+            RGB current_pixel= getColor(x,y);
+            r += current_pixel.red; 
+            g += current_pixel.green;
+            b += current_pixel.blue;
+            count += 1;
+        }
     }
+
+    return RGB(r / count, g / count, b / count);
+}
+
+
+BMP BMP::compress(BMP bmp, int compression_depth) {
+    bmp.initialize(header.width/compression_depth, header.height/compression_depth);
+    
+    if (compression_depth <= 1) {
+        Logger::exit(ERR_INVALID_ARGUMENT, invaild_compression_depth);
+    }
+    
+    for (int x = 0; x < header.width; x+=compression_depth){
+        for (int y = 0; y < header.height; y+=compression_depth) {
+            bmp.setColor(x / compression_depth, y / compression_depth, getAverageColor(x, y, compression_depth));
+        }
+    }
+    return bmp;
 }

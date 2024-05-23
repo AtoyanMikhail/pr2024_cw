@@ -57,7 +57,9 @@ struct Operations
     RGB new_color;                       /**< Новый цвет, на который будет заменен старый цвет. */
     bool ornament = false;                  /**< Флаг разделения изображения на части. */
     std::string pattern;
-    int count = 0;                    
+    int count = 0;
+    bool compress = false;
+    int num = 1;                    
 
 
     Operations()

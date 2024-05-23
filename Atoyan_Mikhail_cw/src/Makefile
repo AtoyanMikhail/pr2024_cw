@@ -21,7 +21,7 @@ $(OBJDIR)/%.o: $(SRC_DIR)/%.cpp
 	@mkdir -p $(OBJDIR)
 	$(CC) $(CXXFLAGS) -I$(INCDIR) -c $< -o $@
 
-clean:
+clear:
 	$(RM) -r $(OBJDIR) $(EXECUTABLE)
 
 docs:

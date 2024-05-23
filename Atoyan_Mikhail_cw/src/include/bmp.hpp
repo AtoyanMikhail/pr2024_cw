@@ -16,14 +16,19 @@ private:
 
     void drawRectangle(const Coordinate left, const Coordinate right, const RGB color);
 
-public:
-    void getInfo() const;
+    void drawThickLine(int x0, int y0, int x1, int y1, int thickness, const RGB color);
 
+    RGB getAverageColor(int x, int y, int compression_depth);
+public:
     BMP(const std::string &fileName);
 
     bool isValid() const;
 
     void save(const std::string &fileName);
+
+    void getInfo() const;
+
+    void initialize(int32_t width, int32_t height);
 
     void hexagon(const Coordinate center, const int radius, const int thickness, const RGB color,
                  const bool fill = false, const RGB fill_color = {0, 0, 0});
@@ -34,6 +39,8 @@ public:
     void colorReplace(const RGB &color_replace_old_color, const RGB &color_replace_new_color);
 
     void ornament(const std::string pattern, const RGB colour, const int thikness, const int count);
+
+    BMP compress(BMP bmp, int compression_depth);
 
 private:
     BMPHeader header;            ///< Заголовок BMP файла.
