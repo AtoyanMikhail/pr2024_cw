@@ -58,13 +58,16 @@ void displayHelp()
     Logger::log(new_color_option_description);
     //=======================================
     Logger::log(hexagon_option_description);
+    Logger::log(radius_option_description);
+    Logger::log(color_option_description);
+    Logger::log(thickness_option_description);
     Logger::log(fill_option_description);
     Logger::log(fill_color_option_description);
     //=======================================
     Logger::log(ornament_option_description);
-    Logger::log(color_option_description);
-    Logger::log(radius_option_description);
-    Logger::log(thickness_option_description);
+    //=======================================
+    Logger::log(compress_option_description);
+    Logger::log(num_option_description);
     Logger::log(output_option_description);
     Logger::log(input_option_description);
     Logger::log(help_option_description);

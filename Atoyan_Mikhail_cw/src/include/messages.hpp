@@ -88,27 +88,29 @@ const std::string help_usage_description = "Usage: program_name [options] filena
 
 const std::string help_usage_start = "Options: ";
 
-const std::string hexagon_option_description = "  --hexagon              Hexagon operation";
+const std::string hexagon_option_description = "  --hexagon              Drawing hexagon";
 
-const std::string left_up_option_description = "  --left_up <x.y>        Coordinates of left-up corner";
+const std::string left_up_option_description = "  --left_up <x.y>        Coordinates of left-up corner for --copy";
 
-const std::string right_down_option_description = "  --right_down <x.y>     Coordinates of right-down corner";
+const std::string right_down_option_description = "  --right_down <x.y>     Coordinates of right-down corner for --copy";
 
-const std::string dest_left_up_option_description = "  --dest_left_up <x.y>   Coordinates of destination left-up corner";
+const std::string dest_left_up_option_description = "  --dest_left_up <x.y>   Coordinates of destination left-up corner for --copy";
 
-const std::string old_color_option_description = "  --old_color <r.g.b>    Old color to replace";
+const std::string old_color_option_description = "  --old_color <r.g.b>    Ccolor to be replaced";
 
-const std::string new_color_option_description = "  --new_color <r.g.b>    New color to replace with";
+const std::string new_color_option_description = "  --new_color <r.g.b>    Color for replacing";
 
 const std::string color_option_description = "  --color <r.g.b>        Color of hexagon/ornament";
 
-const std::string copy_option_description = "  --copy                 Copy operation";
+const std::string copy_option_description = "  --copy                 Copying part of image inside iteself";
 
-const std::string color_replace_option_description = "  --color_replace        Color replace operation";
+const std::string color_replace_option_description = "  --color_replace        Replacing one color in image to another";
 
-const std::string ornament_option_description = "  --split                Ornament operation";
+const std::string ornament_option_description = "  --ornament             Drawing ornament";
 
-const std::string radius_option_description = "  --radius <value>       Radius of hexagon";
+const std::string pattern_option_description = " --pattern <string>          Patterns for an ornament: \"circle\", \"rectangle\" , \"semicircles\" ";
+
+const std::string radius_option_description = "  --  radius <value>     Radius of hexagon";
 
 const std::string thickness_option_description = "  --thickness <value>    Thickness of hexagon/ornament";
 
@@ -120,7 +122,11 @@ const std::string help_option_description = "  -h, --help             Display th
 
 const std::string fill_option_description = "  --fill                 Filling hexagon with color";
 
-const std::string fill_color_option_description = "  --fill_color           Color of hexagon's insides";
+const std::string fill_color_option_description = "  --fill_color <r.g.b>   Color of hexagon's insides";
+
+const std::string compress_option_description = "  --compress             Compressing an image";
+
+const std::string num_option_description = "  --num                  Depth of the compression";
 
 const std::string invaild_compression_depth = "Compression depth is invalid";
 
