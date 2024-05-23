@@ -76,13 +76,13 @@ const std::string filling_a_nonexistent_hexagon_err = "Tried to fill a non-exist
 
 const std::string too_many_args_err = "Too many arguments";
 
-const std::string hexagon_warning = "=Hexagon operation is requested=";
+const std::string hexagon_warning = "~Hexagon operation is requested";
 
-const std::string color_replace_warning = "=Color replace operation is requested=";
+const std::string color_replace_warning = "~Color replace operation is requested";
 
-const std::string ornamenet_warning = "=Ornament operation is requested=";
+const std::string ornamenet_warning = "~Ornament operation is requested";
 
-const std::string image_copy_warning = "=Image copy operation is requested=";
+const std::string image_copy_warning = "~Image copy operation is requested";
 
 const std::string help_usage_description = "Usage: program_name [options] filename";
 
@@ -121,5 +121,9 @@ const std::string help_option_description = "  -h, --help             Display th
 const std::string fill_option_description = "  --fill                 Filling hexagon with color";
 
 const std::string fill_color_option_description = "  --fill_color           Color of hexagon's insides";
+
+const std::string invaild_compression_depth = "Compression depth is invalid";
+
+const std::string compress_warning = "~Compression is requested";
 
 
